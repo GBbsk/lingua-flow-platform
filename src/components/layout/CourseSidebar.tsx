@@ -1,4 +1,3 @@
-
 import React, { useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -21,7 +20,7 @@ export const CourseSidebar = () => {
   const isAdmin = user?.role === 'admin';
 
   const mainMenuItems = [
-    { title: "Início", path: "/", icon: Home },
+    { title: "Início", path: "/modules", icon: Home },
     { title: "Módulos", path: "/modules", icon: Book },
   ];
 
