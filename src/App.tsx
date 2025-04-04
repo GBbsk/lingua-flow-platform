@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { MainLayout } from "@/components/layout/MainLayout";
 
 // Pages
@@ -24,7 +24,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<MainLayout><HomePage /></MainLayout>} />
+          <Route path="/" element={<Navigate to="/modules" replace />} />
           <Route path="/modules" element={<MainLayout><ModulesPage /></MainLayout>} />
           <Route path="/modules/:moduleId" element={<MainLayout><ModuleDetailPage /></MainLayout>} />
           <Route path="/modules/:moduleId/lessons/:lessonId" element={<MainLayout><LessonPage /></MainLayout>} />
