@@ -94,6 +94,21 @@
 
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "ss01", "ss02", "cv01", "cv02", "cv03";
+  }
+}
+
+@layer utilities {
+  .glass-effect {
+    @apply backdrop-blur-sm bg-white/30 border border-white/20;
+  }
+  
+  .card-gradient {
+    @apply bg-gradient-to-br from-card to-card/80 backdrop-blur-sm;
+  }
+  
+  .hover-scale {
+    @apply transition-transform duration-200 hover:scale-[1.02];
   }
 }
 
@@ -102,15 +117,15 @@
 }
 
 .audio-player-custom {
-  @apply w-full bg-secondary rounded-lg p-4 shadow-md;
+  @apply w-full bg-card rounded-lg p-4 shadow-sm border border-primary/10 hover:border-primary/20 transition-colors;
 }
 
 .audio-player-custom .transcript {
-  @apply mt-4 p-4 bg-white rounded border border-border shadow-sm;
+  @apply mt-4 p-4 bg-background rounded border border-border shadow-sm;
 }
 
 .audio-progress {
-  @apply h-2 rounded-full bg-gray-200 overflow-hidden mt-2;
+  @apply h-2 rounded-full bg-muted overflow-hidden mt-2;
 }
 
 .audio-progress-bar {
@@ -118,5 +133,5 @@
 }
 
 .course-card {
-  @apply bg-white border border-border rounded-lg shadow-md hover:shadow-lg transition-shadow;
+  @apply bg-card border border-border rounded-lg shadow-sm hover:shadow-lg transition-shadow hover-scale;
 }

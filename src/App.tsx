@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { MainLayout } from "@/components/layout/MainLayout";
 
 // Pages
+import HomePage from "./pages/HomePage";
 import ModulesPage from "./pages/ModulesPage";
 import ModuleDetailPage from "./pages/ModuleDetailPage";
 import LessonPage from "./pages/LessonPage";
@@ -23,7 +24,8 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Navigate to="/modules" replace />} />
+          <Route path="/" element={<Navigate to="/home" replace />} />
+          <Route path="/home" element={<MainLayout><HomePage /></MainLayout>} />
           <Route path="/modules" element={<MainLayout><ModulesPage /></MainLayout>} />
           <Route path="/modules/:moduleId" element={<MainLayout><ModuleDetailPage /></MainLayout>} />
           <Route path="/modules/:moduleId/lessons/:lessonId" element={<MainLayout><LessonPage /></MainLayout>} />

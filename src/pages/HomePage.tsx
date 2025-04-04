@@ -1,16 +1,17 @@
 
 import React, { useContext } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { UserContext } from '@/components/layout/MainLayout';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { Link } from 'react-router-dom';
-import { BookOpen, Clock, Award } from 'lucide-react';
+import { BookOpen, Clock, Award, ChevronRight, PlayCircle, Book, BarChart, Calendar } from 'lucide-react';
 import { sampleModules } from '@/data/sampleData';
+import { Progress } from '@/components/ui/progress';
 
 const HomePage = () => {
   const { user } = useContext(UserContext);
-  const recentModules = sampleModules.slice(0, 2);
+  const recentModules = sampleModules.slice(0, 3);
   
   return (
     <div className="container py-8">
@@ -19,25 +20,29 @@ const HomePage = () => {
         description="Continue seu progresso no curso de inglês"
       />
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <Card>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <Card className="bg-gradient-to-br from-card/80 to-card shadow-md border border-primary/10 hover:border-primary/20 transition-colors">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Progresso Total</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center">
+              <BarChart className="mr-2 h-4 w-4 text-primary/70" />
+              Progresso Total
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-end space-x-1">
               <span className="text-3xl font-bold">25%</span>
               <span className="text-muted-foreground pb-1">completado</span>
             </div>
-            <div className="w-full h-2 bg-muted rounded-full mt-2 overflow-hidden">
-              <div className="bg-primary h-full rounded-full" style={{ width: '25%' }}></div>
-            </div>
+            <Progress value={25} className="h-2 mt-2" />
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="bg-gradient-to-br from-card/80 to-card shadow-md border border-primary/10 hover:border-primary/20 transition-colors">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Aulas Assistidas</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center">
+              <BookOpen className="mr-2 h-4 w-4 text-primary/70" />
+              Aulas Assistidas
+            </CardTitle>
           </CardHeader>
           <CardContent className="flex items-baseline space-x-2">
             <span className="text-3xl font-bold">3</span>
@@ -45,60 +50,88 @@ const HomePage = () => {
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="bg-gradient-to-br from-card/80 to-card shadow-md border border-primary/10 hover:border-primary/20 transition-colors">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Tempo Estudado</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center">
+              <Clock className="mr-2 h-4 w-4 text-primary/70" />
+              Tempo Estudado
+            </CardTitle>
           </CardHeader>
           <CardContent className="flex items-center">
-            <Clock className="mr-2 h-4 w-4 text-muted-foreground" />
             <span className="text-3xl font-bold">4:30</span>
             <span className="text-muted-foreground ml-1">horas</span>
           </CardContent>
         </Card>
       </div>
       
-      <div className="mb-8">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">Continue Estudando</h2>
-          <Button variant="outline" asChild>
-            <Link to="/modules">Ver Todos os Módulos</Link>
+      <div className="mb-12">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-bold flex items-center">
+            <Calendar className="mr-2 h-5 w-5 text-primary" />
+            Continue Estudando
+          </h2>
+          <Button variant="outline" asChild className="gap-1">
+            <Link to="/modules">
+              Ver Todos os Módulos
+              <ChevronRight className="h-4 w-4" />
+            </Link>
           </Button>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {recentModules.map(module => (
-            <Card key={module.id} className="course-card">
+            <Card key={module.id} className="course-card bg-gradient-to-br from-card/60 to-card border-primary/5 hover:shadow-lg hover:border-primary/20 transition-all">
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg">{module.title}</CardTitle>
+                <CardDescription>{module.description.slice(0, 60)}...</CardDescription>
               </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-4">{module.description}</p>
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center text-sm">
-                    <BookOpen className="h-4 w-4 mr-1 text-muted-foreground" />
+              <CardContent className="pt-2">
+                <div className="flex justify-between items-center text-sm text-muted-foreground">
+                  <div className="flex items-center">
+                    <Book className="h-4 w-4 mr-1" />
                     <span>{module.lessons.length} {module.lessons.length === 1 ? 'Aula' : 'Aulas'}</span>
                   </div>
-                  <Button asChild>
-                    <Link to={`/modules/${module.id}`}>Continuar</Link>
-                  </Button>
+                  <div className="flex items-center">
+                    <Clock className="h-4 w-4 mr-1" />
+                    <span>2h 30min</span>
+                  </div>
                 </div>
+                <Progress value={module.progress || 20} className="h-1.5 mt-3" />
               </CardContent>
+              <CardFooter className="pt-2">
+                <Button asChild className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70">
+                  <Link to={`/modules/${module.id}`} className="flex items-center justify-center">
+                    <PlayCircle className="h-4 w-4 mr-1" />
+                    Continuar
+                  </Link>
+                </Button>
+              </CardFooter>
             </Card>
           ))}
         </div>
       </div>
       
       <div>
-        <h2 className="text-xl font-bold mb-4">Conquistas</h2>
+        <h2 className="text-xl font-bold mb-6 flex items-center">
+          <Award className="mr-2 h-5 w-5 text-primary" />
+          Conquistas
+        </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          {['Iniciante', 'Dedicação', 'Fluência', 'Vocabulário'].map((badge, index) => (
-            <div key={index} className="flex flex-col items-center p-4 border rounded-lg bg-muted/30">
-              <div className="bg-primary/10 rounded-full p-3 mb-2">
-                <Award className="h-6 w-6 text-primary" />
+          {[
+            { name: 'Iniciante', icon: Book, earned: true },
+            { name: 'Dedicação', icon: Clock, earned: true },
+            { name: 'Fluência', icon: BookOpen, earned: false },
+            { name: 'Vocabulário', icon: Award, earned: false }
+          ].map((badge, index) => (
+            <Card key={index} className={`flex flex-col items-center p-4 ${badge.earned ? 'bg-gradient-to-br from-primary/10 to-card' : 'bg-muted/20'}`}>
+              <div className={`rounded-full p-3 mb-2 ${badge.earned ? 'bg-primary/20 text-primary' : 'bg-muted/40 text-muted-foreground'}`}>
+                <badge.icon className="h-6 w-6" />
               </div>
-              <span className="font-medium">{badge}</span>
-              <span className="text-xs text-muted-foreground">Desbloqueado</span>
-            </div>
+              <span className="font-medium">{badge.name}</span>
+              <span className="text-xs text-muted-foreground">
+                {badge.earned ? 'Desbloqueado' : 'Bloqueado'}
+              </span>
+            </Card>
           ))}
         </div>
       </div>

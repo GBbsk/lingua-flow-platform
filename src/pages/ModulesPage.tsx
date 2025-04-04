@@ -4,17 +4,20 @@ import { PageHeader } from '@/components/shared/PageHeader';
 import { ModuleCard } from '@/components/modules/ModuleCard';
 import { sampleModules } from '@/data/sampleData';
 import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, Book, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const ModulesPage = () => {
+  const beginnerModules = sampleModules.filter(m => m.level === 'beginner');
+  const advancedModules = sampleModules.filter(m => m.level !== 'beginner');
+  
   return (
     <div className="container py-8 px-4 md:px-6">
       <PageHeader 
         title="Módulos do Curso"
         description="Explore todos os módulos disponíveis e comece sua jornada de aprendizado de inglês."
       >
-        <Button asChild className="shadow-md">
+        <Button asChild className="shadow-md bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70">
           <Link to="/admin" className="flex items-center gap-2">
             <PlusCircle className="h-4 w-4" />
             Painel Admin
@@ -22,10 +25,28 @@ const ModulesPage = () => {
         </Button>
       </PageHeader>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {sampleModules.map(module => (
-          <ModuleCard key={module.id} module={module} />
-        ))}
+      <div className="mt-8">
+        <div className="flex items-center gap-2 mb-4">
+          <Book className="h-5 w-5 text-primary" />
+          <h2 className="text-xl font-semibold">Módulos para Iniciantes</h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {beginnerModules.map(module => (
+            <ModuleCard key={module.id} module={module} />
+          ))}
+        </div>
+      </div>
+      
+      <div className="mt-12">
+        <div className="flex items-center gap-2 mb-4">
+          <Sparkles className="h-5 w-5 text-primary" />
+          <h2 className="text-xl font-semibold">Módulos Avançados</h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {advancedModules.map(module => (
+            <ModuleCard key={module.id} module={module} />
+          ))}
+        </div>
       </div>
       
       <div className="mt-16 p-8 bg-gradient-to-br from-primary/5 to-secondary/30 rounded-xl shadow-sm border">
