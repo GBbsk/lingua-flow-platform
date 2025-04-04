@@ -1,4 +1,3 @@
-
 import React, { useContext } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
@@ -8,17 +7,13 @@ import { Link } from 'react-router-dom';
 import { BookOpen, Clock, Award, ChevronRight, PlayCircle, Book, BarChart, Calendar } from 'lucide-react';
 import { sampleModules } from '@/data/sampleData';
 import { Progress } from '@/components/ui/progress';
-
 const HomePage = () => {
-  const { user } = useContext(UserContext);
+  const {
+    user
+  } = useContext(UserContext);
   const recentModules = sampleModules.slice(0, 3);
-  
-  return (
-    <div className="container py-8">
-      <PageHeader 
-        title={`Bem-vindo, ${user?.name}!`}
-        description="Continue seu progresso no curso de inglês"
-      />
+  return <div className="container py-8 mx-0 px-0 bg-slate-200">
+      <PageHeader title={`Bem-vindo, ${user?.name}!`} description="Continue seu progresso no curso de inglês" />
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
         <Card className="bg-gradient-to-br from-card/80 to-card shadow-md border border-primary/10 hover:border-primary/20 transition-colors">
@@ -66,7 +61,7 @@ const HomePage = () => {
       
       <div className="mb-12">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold flex items-center">
+          <h2 className="text-xl font-bold flex items-center mx-0">
             <Calendar className="mr-2 h-5 w-5 text-primary" />
             Continue Estudando
           </h2>
@@ -79,8 +74,7 @@ const HomePage = () => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {recentModules.map(module => (
-            <Card key={module.id} className="course-card bg-gradient-to-br from-card/60 to-card border-primary/5 hover:shadow-lg hover:border-primary/20 transition-all">
+          {recentModules.map(module => <Card key={module.id} className="course-card bg-gradient-to-br from-card/60 to-card border-primary/5 hover:shadow-lg hover:border-primary/20 transition-all">
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg">{module.title}</CardTitle>
                 <CardDescription>{module.description.slice(0, 60)}...</CardDescription>
@@ -106,8 +100,7 @@ const HomePage = () => {
                   </Link>
                 </Button>
               </CardFooter>
-            </Card>
-          ))}
+            </Card>)}
         </div>
       </div>
       
@@ -117,13 +110,23 @@ const HomePage = () => {
           Conquistas
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { name: 'Iniciante', icon: Book, earned: true },
-            { name: 'Dedicação', icon: Clock, earned: true },
-            { name: 'Fluência', icon: BookOpen, earned: false },
-            { name: 'Vocabulário', icon: Award, earned: false }
-          ].map((badge, index) => (
-            <Card key={index} className={`flex flex-col items-center p-4 ${badge.earned ? 'bg-gradient-to-br from-primary/10 to-card' : 'bg-muted/20'}`}>
+          {[{
+          name: 'Iniciante',
+          icon: Book,
+          earned: true
+        }, {
+          name: 'Dedicação',
+          icon: Clock,
+          earned: true
+        }, {
+          name: 'Fluência',
+          icon: BookOpen,
+          earned: false
+        }, {
+          name: 'Vocabulário',
+          icon: Award,
+          earned: false
+        }].map((badge, index) => <Card key={index} className={`flex flex-col items-center p-4 ${badge.earned ? 'bg-gradient-to-br from-primary/10 to-card' : 'bg-muted/20'}`}>
               <div className={`rounded-full p-3 mb-2 ${badge.earned ? 'bg-primary/20 text-primary' : 'bg-muted/40 text-muted-foreground'}`}>
                 <badge.icon className="h-6 w-6" />
               </div>
@@ -131,12 +134,9 @@ const HomePage = () => {
               <span className="text-xs text-muted-foreground">
                 {badge.earned ? 'Desbloqueado' : 'Bloqueado'}
               </span>
-            </Card>
-          ))}
+            </Card>)}
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default HomePage;
