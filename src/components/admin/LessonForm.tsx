@@ -1,12 +1,12 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Lesson, ResourceFile, AudioResource } from '@/types';
 import { toast } from 'sonner';
-import { X, Plus } from 'lucide-react';
+import { X, Plus, Upload } from 'lucide-react';
 
 interface LessonFormProps {
   moduleId: string;
@@ -31,6 +31,10 @@ export const LessonForm = ({ moduleId, lesson, onSubmit, onCancel }: LessonFormP
   const [newAudioTitle, setNewAudioTitle] = useState('');
   const [newAudioUrl, setNewAudioUrl] = useState('');
   const [newAudioTranscript, setNewAudioTranscript] = useState('');
+  
+  // References for file inputs
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const audioInputRef = useRef<HTMLInputElement>(null);
   
   const handleAddFile = () => {
     if (!newFileName || !newFileUrl || !newFileType) {
@@ -76,6 +80,47 @@ export const LessonForm = ({ moduleId, lesson, onSubmit, onCancel }: LessonFormP
   
   const handleRemoveAudio = (audioId: string) => {
     setAudios(audios.filter(audio => audio.id !== audioId));
+  };
+  
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+    
+    const file = files[0];
+    // Create a local URL for the file
+    const url = URL.createObjectURL(file);
+    
+    // Set file info in the form
+    setNewFileName(file.name);
+    setNewFileUrl(url);
+    setNewFileType(file.type.split('/')[1] || 'pdf');
+    
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+    
+    toast.success('Arquivo selecionado com sucesso!');
+  };
+  
+  const handleAudioSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+    
+    const file = files[0];
+    // Create a local URL for the file
+    const url = URL.createObjectURL(file);
+    
+    // Set audio info in the form
+    setNewAudioTitle(file.name.replace(/\.[^/.]+$/, ""));
+    setNewAudioUrl(url);
+    
+    // Reset file input
+    if (audioInputRef.current) {
+      audioInputRef.current.value = '';
+    }
+    
+    toast.success('Áudio selecionado com sucesso!');
   };
   
   const handleSubmit = (e: React.FormEvent) => {
@@ -160,6 +205,30 @@ export const LessonForm = ({ moduleId, lesson, onSubmit, onCancel }: LessonFormP
           ))}
         </div>
         
+        <div className="grid grid-cols-1 gap-4 mb-4">
+          <div className="border border-dashed rounded-lg p-4 text-center">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileSelect}
+              className="hidden"
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.jpg,.jpeg,.png"
+            />
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full h-20 flex flex-col items-center justify-center gap-2"
+            >
+              <Upload className="h-6 w-6" />
+              <span>Clique para selecionar um arquivo</span>
+            </Button>
+            <p className="text-xs text-muted-foreground mt-2">
+              Arquivos PDF, DOCX, imagens, etc.
+            </p>
+          </div>
+        </div>
+        
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <Label htmlFor="newFileName">Nome do Arquivo</Label>
@@ -221,6 +290,30 @@ export const LessonForm = ({ moduleId, lesson, onSubmit, onCancel }: LessonFormP
               </Button>
             </div>
           ))}
+        </div>
+        
+        <div className="grid grid-cols-1 gap-4 mb-4">
+          <div className="border border-dashed rounded-lg p-4 text-center">
+            <input
+              type="file"
+              ref={audioInputRef}
+              onChange={handleAudioSelect}
+              className="hidden"
+              accept="audio/*"
+            />
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => audioInputRef.current?.click()}
+              className="w-full h-20 flex flex-col items-center justify-center gap-2"
+            >
+              <Upload className="h-6 w-6" />
+              <span>Clique para selecionar um áudio</span>
+            </Button>
+            <p className="text-xs text-muted-foreground mt-2">
+              Formatos MP3, WAV, etc.
+            </p>
+          </div>
         </div>
         
         <div className="space-y-4">
