@@ -1,0 +1,86 @@
+{
+  "modules": [
+    {
+      "id": "module-1743813280711",
+      "title": "PRIMEIRO MODULO",
+      "description": "a",
+      "thumbnail": "",
+      "lessons": [
+        {
+          "id": "lesson-1743813297204",
+          "title": "AULA 01",
+          "description": "a",
+          "videoUrl": "https://www.youtube.com/embed/TeRCvJmm_-s",
+          "files": [
+            {
+              "id": "file-1743813297204",
+              "name": "Material de Estudo",
+              "url": "https://drive.google.com/file/d/10r2N80ju_NFmziu-oDKeHayDGVuva7aE/preview",
+              "type": "pdf"
+            }
+          ],
+          "audios": [
+            {
+              "id": "audio-1743813297204",
+              "title": "Áudio da Aula",
+              "url": "https://www.dropbox.com/scl/fi/ft88b3k7js71ziv5cw5es/AUDIO-Jack-Hannaford-01-Jake.mp3?dl=1",
+              "transcript": "AAAAAAAAAA"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "module-1743814921554",
+      "title": "LULAO DA O RABAO",
+      "description": "a",
+      "thumbnail": "",
+      "lessons": [
+        {
+          "id": "lesson-1743815053802",
+          "title": "AULA 2",
+          "description": "a",
+          "videoUrl": "https://www.youtube.com/embed/8olIIkJRG_0?si=INIFAFIaYGGDW2lW",
+          "files": [
+            {
+              "id": "file-1743815053801",
+              "name": "Material de Estudo",
+              "url": "https://drive.google.com/file/d/1conQpKtNJs-JfONA-n3KuxHdmll7xcjE/preview",
+              "type": "pdf"
+            }
+          ],
+          "audios": [
+            {
+              "id": "audio-1743815053801",
+              "title": "Áudio da Aula",
+              "url": "https://www.dropbox.com/scl/fi/y1n4zd2otabist1gx5u1g/AUDIO-Jack-Hannaford-02-John.mp3?dl=1",
+              "transcript": ""
+            }
+          ]
+        },
+        {
+          "id": "lesson-1743815310377",
+          "title": "aaAAAAAA",
+          "description": "aaaaaaaaaaaaaaaa",
+          "videoUrl": "https://www.youtube.com/embed/8olIIkJRG_0?si=INIFAFIaYGGDW2lW",
+          "files": [
+            {
+              "id": "file-1743815310377",
+              "name": "Material de Estudo",
+              "url": "https://www.dropbox.com/scl/fi/zd88u5w0qb1v8qoatnpn0/PDF-Jack-Hannaford-002.pdf?raw=1",
+              "type": "pdf"
+            }
+          ],
+          "audios": [
+            {
+              "id": "audio-1743815310377",
+              "title": "Áudio da Aula",
+              "url": "https://www.dropbox.com/scl/fi/y1n4zd2otabist1gx5u1g/AUDIO-Jack-Hannaford-02-John.mp3?dl=1",
+              "transcript": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

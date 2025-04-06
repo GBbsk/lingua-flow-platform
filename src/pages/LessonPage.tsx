@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { Button } from '@/components/ui/button';
-import { sampleModules } from '@/data/sampleData';
+import moduleData from '@/data/moduleData.json';
 import { 
   ArrowLeft, 
   FileText, 
@@ -28,18 +28,43 @@ const LessonPage = () => {
   const [module, setModule] = useState<Module | null>(null);
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [completed, setCompleted] = useState(false);
-  
+
   useEffect(() => {
-    // In a real application, you would fetch this data from your API
-    const foundModule = sampleModules.find(m => m.id === moduleId);
+    // Use moduleData.modules to find the module
+    const foundModule = moduleData.modules.find(m => m.id === moduleId);
     setModule(foundModule || null);
-    
+
     if (foundModule) {
       const foundLesson = foundModule.lessons.find(l => l.id === lessonId);
       setLesson(foundLesson || null);
       setCompleted(false); // Reset completion status on lesson change
     }
   }, [moduleId, lessonId]);
+
+  const findNextLesson = (): { moduleId: string, lessonId: string } | null => {
+    const currentLessonIndex = module.lessons.findIndex(l => l.id === lessonId);
+    
+    if (currentLessonIndex < module.lessons.length - 1) {
+      // There's another lesson in this module
+      return {
+        moduleId: module.id,
+        lessonId: module.lessons[currentLessonIndex + 1].id
+      };
+    }
+    
+    // Check if there's another module
+    const currentModuleIndex = moduleData.modules.findIndex(m => m.id === moduleId);
+    
+    if (currentModuleIndex < moduleData.modules.length - 1 && moduleData.modules[currentModuleIndex + 1].lessons.length > 0) {
+      // There's another module with lessons
+      return {
+        moduleId: moduleData.modules[currentModuleIndex + 1].id,
+        lessonId: moduleData.modules[currentModuleIndex + 1].lessons[0].id
+      };
+    }
+    
+    return null;
+  };
   
   if (!module || !lesson) {
     return (
@@ -58,31 +83,6 @@ const LessonPage = () => {
   const markAsCompleted = () => {
     setCompleted(true);
     toast.success("Aula marcada como concluída!");
-  };
-  
-  const findNextLesson = (): { moduleId: string, lessonId: string } | null => {
-    const currentLessonIndex = module.lessons.findIndex(l => l.id === lessonId);
-    
-    if (currentLessonIndex < module.lessons.length - 1) {
-      // There's another lesson in this module
-      return {
-        moduleId: module.id,
-        lessonId: module.lessons[currentLessonIndex + 1].id
-      };
-    }
-    
-    // Check if there's another module
-    const currentModuleIndex = sampleModules.findIndex(m => m.id === moduleId);
-    
-    if (currentModuleIndex < sampleModules.length - 1 && sampleModules[currentModuleIndex + 1].lessons.length > 0) {
-      // There's another module with lessons
-      return {
-        moduleId: sampleModules[currentModuleIndex + 1].id,
-        lessonId: sampleModules[currentModuleIndex + 1].lessons[0].id
-      };
-    }
-    
-    return null;
   };
   
   const nextLesson = findNextLesson();

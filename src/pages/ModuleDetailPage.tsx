@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { Button } from '@/components/ui/button';
-import { sampleModules } from '@/data/sampleData';
+import moduleData from '@/data/moduleData.json'; // Import the JSON data correctly
 import { ArrowLeft, Play, CheckCircle, Clock, BookOpen, BarChart } from 'lucide-react';
 import { Module } from '@/types';
 import { Card, CardContent } from '@/components/ui/card';
@@ -12,13 +12,13 @@ import { Progress } from '@/components/ui/progress';
 const ModuleDetailPage = () => {
   const { moduleId } = useParams<{ moduleId: string }>();
   const [module, setModule] = useState<Module | null>(null);
-  
+
   useEffect(() => {
-    // In a real application, you would fetch this data from your API
-    const foundModule = sampleModules.find(m => m.id === moduleId);
+    // Use moduleData.modules to find the module
+    const foundModule = moduleData.modules.find(m => m.id === moduleId);
     setModule(foundModule || null);
   }, [moduleId]);
-  
+
   if (!module) {
     return (
       <div className="container py-8">

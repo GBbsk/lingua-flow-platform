@@ -1,32 +1,56 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { PageHeader } from '@/components/shared/PageHeader';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { sampleModules } from '@/data/sampleData';
-import { ModuleForm } from '@/components/admin/ModuleForm';
-import { LessonForm } from '@/components/admin/LessonForm';
-import { Module, Lesson } from '@/types';
-import { ModuleCard } from '@/components/modules/ModuleCard';
-import { Edit, Plus, Trash2, Book, Video, Users } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Book, Edit, Plus, Trash2, Video, Users } from 'lucide-react';
 import { toast } from 'sonner';
-import { Link } from 'react-router-dom';
+import { Module, Lesson, ResourceFile, AudioResource } from '@/types';
+// Remove unused imports
+import { 
+  getAllModules, 
+  saveModule, 
+  deleteModule, 
+  saveLesson, 
+  deleteLesson,
+  removeFileFromLesson,
+  removeAudioFromLesson
+} from '@/services/moduleService';
+import ModuleForm from '@/components/admin/ModuleForm';
+import LessonForm from '@/components/admin/LessonForm';
+
 
 const AdminDashboard = () => {
-  const [modules, setModules] = useState(sampleModules);
+  const [modules, setModules] = useState<Module[]>([]);
   const [isModuleDialogOpen, setIsModuleDialogOpen] = useState(false);
   const [isLessonDialogOpen, setIsLessonDialogOpen] = useState(false);
+  const [isResourceDialogOpen, setIsResourceDialogOpen] = useState(false);
   const [editingModule, setEditingModule] = useState<Module | null>(null);
   const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
   const [selectedModuleId, setSelectedModuleId] = useState<string | null>(null);
+  const [selectedLessonId, setSelectedLessonId] = useState<string | null>(null);
+  const [resourceType, setResourceType] = useState<'file' | 'audio'>('file');
+  
+  // Estados para o formulário de módulo
+  const [moduleTitle, setModuleTitle] = useState('');
+  const [moduleDescription, setModuleDescription] = useState('');
+  const [moduleThumbnail, setModuleThumbnail] = useState('');
+  
+  // Estados para o formulário de aula
+  const [lessonTitle, setLessonTitle] = useState('');
+  const [lessonDescription, setLessonDescription] = useState('');
+  const [lessonVideoUrl, setLessonVideoUrl] = useState('');
+  
+  // Estados para o formulário de recurso
+  const [resourceName, setResourceName] = useState('');
+  const [resourceUrl, setResourceUrl] = useState('');
+  const [resourceType2, setResourceType2] = useState(`pdf`);
   
   const handleAddModule = () => {
     setEditingModule(null);
@@ -36,35 +60,6 @@ const AdminDashboard = () => {
   const handleEditModule = (module: Module) => {
     setEditingModule(module);
     setIsModuleDialogOpen(true);
-  };
-  
-  const handleDeleteModule = (moduleId: string) => {
-    setModules(modules.filter(m => m.id !== moduleId));
-    toast.success('Módulo removido com sucesso');
-  };
-  
-  const handleModuleSubmit = (moduleData: Partial<Module>) => {
-    if (editingModule) {
-      // Update existing module
-      setModules(modules.map(m => 
-        m.id === editingModule.id 
-          ? { ...m, ...moduleData }
-          : m
-      ));
-      toast.success('Módulo atualizado com sucesso');
-    } else {
-      // Create new module
-      const newModule: Module = {
-        id: `module-${Date.now()}`,
-        title: moduleData.title || 'Novo Módulo',
-        description: moduleData.description || '',
-        thumbnail: moduleData.thumbnail,
-        lessons: [],
-      };
-      setModules([...modules, newModule]);
-      toast.success('Módulo criado com sucesso');
-    }
-    setIsModuleDialogOpen(false);
   };
   
   const handleAddLesson = (moduleId: string) => {
@@ -79,54 +74,115 @@ const AdminDashboard = () => {
     setIsLessonDialogOpen(true);
   };
   
-  const handleDeleteLesson = (moduleId: string, lessonId: string) => {
-    setModules(modules.map(m => 
-      m.id === moduleId 
-        ? { ...m, lessons: m.lessons.filter(l => l.id !== lessonId) }
-        : m
-    ));
-    toast.success('Aula removida com sucesso');
+  useEffect(() => {
+    loadModules();
+  }, []);
+
+  const loadModules = async () => {
+    try {
+      const data = await getAllModules();
+      setModules(data);
+    } catch (error) {
+      toast.error('Erro ao carregar módulos');
+    }
+  };
+
+  const handleModuleSubmit = async (moduleData: Partial<Module>) => {
+    try {
+      if (editingModule) {
+        const updatedModule = {
+          ...editingModule,
+          ...moduleData
+        };
+        await saveModule(updatedModule);
+      } else {
+        const newModule: Module = {
+          id: `module-${Date.now()}`,
+          title: moduleData.title || 'Novo Módulo',
+          description: moduleData.description || '',
+          thumbnail: moduleData.thumbnail || '',
+          lessons: [],
+        };
+        await saveModule(newModule);
+      }
+      await loadModules();
+      setIsModuleDialogOpen(false);
+      toast.success(editingModule ? 'Módulo atualizado com sucesso' : 'Módulo criado com sucesso');
+    } catch (error) {
+      toast.error('Erro ao salvar módulo');
+    }
+  };
+
+  const handleDeleteModule = async (moduleId: string) => {
+    try {
+      await deleteModule(moduleId);
+      await loadModules();
+      toast.success('Módulo removido com sucesso');
+    } catch (error) {
+      toast.error('Erro ao remover módulo');
+    }
   };
   
-  const handleLessonSubmit = (lessonData: Partial<Lesson>) => {
+  const handleDeleteLesson = async (moduleId: string, lessonId: string) => {
+    try {
+      await deleteLesson(moduleId, lessonId);
+      await loadModules();
+      toast.success('Aula removida com sucesso');
+    } catch (error) {
+      toast.error('Erro ao remover aula');
+    }
+  };
+
+  const handleLessonSubmit = async (lessonData: Partial<Lesson>) => {
     if (!selectedModuleId) return;
     
-    if (editingLesson) {
-      // Update existing lesson
-      setModules(modules.map(m => 
-        m.id === selectedModuleId 
-          ? {
-              ...m,
-              lessons: m.lessons.map(l => 
-                l.id === editingLesson.id 
-                  ? { ...l, ...lessonData } as Lesson
-                  : l
-              )
-            }
-          : m
-      ));
-      toast.success('Aula atualizada com sucesso');
-    } else {
-      // Create new lesson
-      const newLesson: Lesson = {
-        id: `lesson-${Date.now()}`,
-        title: lessonData.title || 'Nova Aula',
-        description: lessonData.description || '',
-        videoUrl: lessonData.videoUrl || '',
-        files: lessonData.files || [],
-        audios: lessonData.audios || [],
-      };
+    try {
+      if (editingLesson) {
+        const updatedLesson: Lesson = {
+          ...editingLesson,
+          ...lessonData
+        } as Lesson;
+        await saveLesson(selectedModuleId, updatedLesson);
+      } else {
+        const newLesson: Lesson = {
+          id: `lesson-${Date.now()}`,
+          title: lessonData.title || 'Nova Aula',
+          description: lessonData.description || '',
+          videoUrl: lessonData.videoUrl || '',
+          files: lessonData.files || [],
+          audios: lessonData.audios || [],
+        };
+        await saveLesson(selectedModuleId, newLesson);
+      }
       
-      setModules(modules.map(m => 
-        m.id === selectedModuleId 
-          ? { ...m, lessons: [...m.lessons, newLesson] }
-          : m
-      ));
-      toast.success('Aula criada com sucesso');
+      await loadModules();
+      setIsLessonDialogOpen(false);
+      toast.success(editingLesson ? 'Aula atualizada com sucesso' : 'Aula criada com sucesso');
+    } catch (error) {
+      toast.error('Erro ao salvar aula');
     }
-    setIsLessonDialogOpen(false);
   };
   
+  const handleDeleteFile = async (moduleId: string, lessonId: string, fileId: string) => {
+    try {
+      await removeFileFromLesson(moduleId, lessonId, fileId);
+      await loadModules();
+      toast.success('Arquivo removido com sucesso');
+    } catch (error) {
+      toast.error('Erro ao remover arquivo');
+    }
+  };
+
+  const handleDeleteAudio = async (moduleId: string, lessonId: string, audioId: string) => {
+    try {
+      await removeAudioFromLesson(moduleId, lessonId, audioId);
+      await loadModules();
+      toast.success('Áudio removido com sucesso');
+    } catch (error) {
+      toast.error('Erro ao remover áudio');
+    }
+  };
+
   const totalLessons = modules.reduce((total, module) => total + module.lessons.length, 0);
   const totalFiles = modules.reduce((total, module) => 
     total + module.lessons.reduce((lessonTotal, lesson) => 
@@ -312,69 +368,55 @@ const AdminDashboard = () => {
         
         <TabsContent value="resources">
           <div className="space-y-8">
+            {/* Files section */}
             <div>
               <h2 className="text-xl font-bold mb-4">Arquivos</h2>
               <div className="border rounded-lg overflow-hidden">
-                <div className="bg-muted p-3 grid grid-cols-12 text-sm font-medium">
-                  <div className="col-span-4">Nome</div>
-                  <div className="col-span-3">Tipo</div>
-                  <div className="col-span-3">Aula</div>
-                  <div className="col-span-2">Ações</div>
-                </div>
-                <div className="divide-y">
                   {modules.flatMap(module => 
-                    module.lessons.flatMap(lesson => 
-                      lesson.files.map(file => (
-                        <div key={file.id} className="p-3 grid grid-cols-12 items-center hover:bg-muted/50">
-                          <div className="col-span-4 truncate">{file.name}</div>
-                          <div className="col-span-3 uppercase text-xs">{file.type}</div>
-                          <div className="col-span-3 text-sm truncate">{lesson.title}</div>
-                          <div className="col-span-2 flex space-x-1">
-                            <Button variant="ghost" size="icon">
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
+                  module.lessons.flatMap(lesson => 
+                    lesson.files.map(file => (
+                      <div key={file.id} className="p-3 grid grid-cols-12 items-center hover:bg-muted/50">
+                        <div className="col-span-4 truncate">{file.name}</div>
+                        <div className="col-span-3 uppercase text-xs">{file.type}</div>
+                        <div className="col-span-3 text-sm truncate">{lesson.title}</div>
+                        <div className="col-span-2 flex space-x-1">
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => handleDeleteFile(module.id, lesson.id, file.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </div>
-                      ))
-                    )
-                  )}
-                </div>
+                      </div>
+                  ))
+                ))}
               </div>
             </div>
             
+            {/* Audios section */}
             <div>
               <h2 className="text-xl font-bold mb-4">Áudios</h2>
               <div className="border rounded-lg overflow-hidden">
-                <div className="bg-muted p-3 grid grid-cols-12 text-sm font-medium">
-                  <div className="col-span-4">Título</div>
-                  <div className="col-span-3">Duração</div>
-                  <div className="col-span-3">Aula</div>
-                  <div className="col-span-2">Ações</div>
-                </div>
-                <div className="divide-y">
-                  {modules.flatMap(module => 
-                    module.lessons.flatMap(lesson => 
-                      lesson.audios.map(audio => (
-                        <div key={audio.id} className="p-3 grid grid-cols-12 items-center hover:bg-muted/50">
-                          <div className="col-span-4 truncate">{audio.title}</div>
-                          <div className="col-span-3">--:--</div>
-                          <div className="col-span-3 text-sm truncate">{lesson.title}</div>
-                          <div className="col-span-2 flex space-x-1">
-                            <Button variant="ghost" size="icon">
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
+                {modules.flatMap(module => 
+                  module.lessons.flatMap(lesson => 
+                    lesson.audios.map(audio => (
+                      <div key={audio.id} className="p-3 grid grid-cols-12 items-center hover:bg-muted/50">
+                        <div className="col-span-4 truncate">{audio.title}</div>
+                        <div className="col-span-3">--:--</div>
+                        <div className="col-span-3 text-sm truncate">{lesson.title}</div>
+                        <div className="col-span-2 flex space-x-1">
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => handleDeleteAudio(module.id, lesson.id, audio.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </div>
-                      ))
-                    )
-                  )}
-                </div>
+                      </div>
+                  ))
+                ))}
               </div>
             </div>
           </div>

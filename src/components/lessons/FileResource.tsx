@@ -11,11 +11,14 @@ interface FileResourceProps {
 
 export const FileResource = ({ file }: FileResourceProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  
+
   const getFileIcon = () => {
     switch (file.type) {
       case 'pdf':
         return <FileTextIcon className="h-4 w-4" />;
+      case 'audio':
+      case 'mp3':
+        return <FileIcon className="h-4 w-4" />; // You can use a specific icon for audio if available
       case 'image':
       case 'png':
       case 'jpg':
@@ -25,12 +28,12 @@ export const FileResource = ({ file }: FileResourceProps) => {
         return <FileIcon className="h-4 w-4" />;
     }
   };
-  
-  const canPreview = ['pdf', 'image', 'png', 'jpg', 'jpeg'].includes(file.type);
-  
+
+  const canPreview = ['pdf', 'image', 'png', 'jpg', 'jpeg', 'audio', 'mp3'].includes(file.type);
+
   return (
     <>
-      <div 
+      <div
         className="flex items-center p-3 rounded-md border bg-card hover:bg-muted/50 cursor-pointer transition-colors"
         onClick={() => canPreview ? setIsOpen(true) : window.open(file.url, '_blank')}
       >
@@ -41,8 +44,8 @@ export const FileResource = ({ file }: FileResourceProps) => {
           <h3 className="text-sm font-medium">{file.name}</h3>
           <p className="text-xs text-muted-foreground uppercase">{file.type}</p>
         </div>
-        <Button 
-          size="sm" 
+        <Button
+          size="sm"
           variant="ghost"
           onClick={(e) => {
             e.stopPropagation();
@@ -52,7 +55,7 @@ export const FileResource = ({ file }: FileResourceProps) => {
           Download
         </Button>
       </div>
-      
+
       {canPreview && (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogContent className="max-w-3xl max-h-[90vh] overflow-auto">
@@ -60,16 +63,21 @@ export const FileResource = ({ file }: FileResourceProps) => {
               <DialogTitle>{file.name}</DialogTitle>
             </DialogHeader>
             {file.type === 'pdf' ? (
-              <iframe 
-                src={file.url} 
-                className="w-full h-[70vh]" 
-                title={file.name} 
+              <iframe
+                src={file.url}
+                className="w-full h-[70vh]"
+                title={file.name}
               />
+            ) : file.type === 'audio' || file.type === 'mp3' ? (
+              <audio controls className="w-full">
+                <source src={file.url} type="audio/mpeg" />
+                Your browser does not support the audio element.
+              </audio>
             ) : (
-              <img 
-                src={file.url} 
-                alt={file.name} 
-                className="max-w-full max-h-[70vh] mx-auto" 
+              <img
+                src={file.url}
+                alt={file.name}
+                className="max-w-full max-h-[70vh] mx-auto"
               />
             )}
           </DialogContent>

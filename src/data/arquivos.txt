@@ -1,0 +1,37 @@
+{
+  "modules": [
+    {
+      "id": "module-1743813280711",
+      "title": "PRIMEIRO MODULO",
+      "description": "a",
+      "thumbnail": "",
+      "lessons": [
+        {
+          "id": "lesson-1743813297204",
+          "title": "AULA 01",
+          "description": "a",
+          "videoUrl": "https://www.youtube.com/embed/8olIIkJRG_0",
+                        https://www.youtube.com/embed/TeRCvJmm_-s
+          "files": [
+            {
+              "id": "file-1743813297204",
+              "name": "Material de Estudo",
+              "url": "https://drive.google.com/file/d/10r2N80ju_NFmziu-oDKeHayDGVuva7aE/preview", 
+              "type": "pdf"
+            }
+          ],
+          "audios": [
+            {
+              "id": "audio-1743813297204",
+              "title": "Áudio da Aula",
+              "url": "-https://www.dropbox.com/scl/fi/gpw6ofytc7vkydilkw6al/AUDIO-Jack-Hannaford-01-Moira.mp3?dl=1", 
+                        https://www.dropbox.com/scl/fi/ft88b3k7js71ziv5cw5es/AUDIO-Jack-Hannaford-01-Jake.mp3?dl=1
+
+              "transcript": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

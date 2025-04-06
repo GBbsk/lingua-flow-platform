@@ -1,18 +1,32 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
+import { getAllModules } from '@/services/moduleService';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { UserContext } from '@/components/layout/MainLayout';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { Link } from 'react-router-dom';
 import { BookOpen, Clock, Award, ChevronRight, PlayCircle, Book, BarChart, Calendar } from 'lucide-react';
-import { sampleModules } from '@/data/sampleData';
-import { Progress } from '@/components/ui/progress';
+import moduleData from '@/data/moduleData.json'; // Correctly import the JSON data
+import { Module } from '@/types'; // Ensure the Module type is imported correctly
+import { Progress } from '@/components/ui/progress'; // Ensure this import is correct
+
 const HomePage = () => {
-  const {
-    user
-  } = useContext(UserContext);
-  const recentModules = sampleModules.slice(0, 3);
-  return <div className="container py-8 mx-0 px-0 bg-slate-200">
+  const { user } = useContext(UserContext);
+  const [modules, setModules] = useState<Module[]>([]);
+  
+  useEffect(() => {
+    const loadModules = async () => {
+      const data = await getAllModules();
+      setModules(data);
+    };
+    loadModules();
+  }, []);
+
+  // Add this before the return statement
+  const recentModules = modules.slice(0, 3); // Get the first 3 modules
+
+  return (
+    <div className="container py-8 mx-0 px-0 bg-slate-200">
       <PageHeader title={`Bem-vindo, ${user?.name}!`} description="Continue seu progresso no curso de inglês" />
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
@@ -74,7 +88,8 @@ const HomePage = () => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {recentModules.map(module => <Card key={module.id} className="course-card bg-gradient-to-br from-card/60 to-card border-primary/5 hover:shadow-lg hover:border-primary/20 transition-all">
+          {recentModules.map(module => (
+            <Card key={module.id} className="course-card bg-gradient-to-br from-card/60 to-card border-primary/5 hover:shadow-lg hover:border-primary/20 transition-all">
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg">{module.title}</CardTitle>
                 <CardDescription>{module.description.slice(0, 60)}...</CardDescription>
@@ -90,7 +105,6 @@ const HomePage = () => {
                     <span>2h 30min</span>
                   </div>
                 </div>
-                <Progress value={module.progress || 20} className="h-1.5 mt-3" />
               </CardContent>
               <CardFooter className="pt-2">
                 <Button asChild className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70">
@@ -100,7 +114,8 @@ const HomePage = () => {
                   </Link>
                 </Button>
               </CardFooter>
-            </Card>)}
+            </Card>
+          ))}
         </div>
       </div>
       
@@ -137,6 +152,9 @@ const HomePage = () => {
             </Card>)}
         </div>
       </div>
-    </div>;
+    </div> 
+    
+  );
 };
+
 export default HomePage;

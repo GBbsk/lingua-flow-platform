@@ -1,15 +1,35 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { getAllModules } from '@/services/moduleService';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { ModuleCard } from '@/components/modules/ModuleCard';
-import { sampleModules } from '@/data/sampleData';
+import { Module } from '@/types'; // Add this import
 import { Button } from '@/components/ui/button';
 import { PlusCircle, Book, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const ModulesPage = () => {
-  const beginnerModules = sampleModules.filter(m => m.level === 'beginner');
-  const advancedModules = sampleModules.filter(m => m.level !== 'beginner');
+  const [modules, setModules] = useState<Module[]>([]);
+
+  useEffect(() => {
+    const loadModules = async () => {
+      try {
+        const modulesList = await getAllModules();
+        setModules(modulesList);
+      } catch (error) {
+        console.error('Error loading modules:', error);
+      }
+    };
+    loadModules();
+  }, []);
+
+  // Remove these lines since we're now using the modules state
+  // const beginnerModules = moduleData.modules;
+  // const advancedModules = moduleData.modules;
+  
+  // Update the rendering to use the modules state
+  const beginnerModules = modules;
+  const advancedModules = modules;
   
   return (
     <div className="container py-8 px-4 md:px-6">

@@ -5,6 +5,7 @@ export interface Module {
   description: string;
   thumbnail?: string;
   lessons: Lesson[];
+  level?: string; // Add this line to include the level property
 }
 
 export interface Lesson {
@@ -12,12 +13,13 @@ export interface Lesson {
   title: string;
   description: string;
   videoUrl: string;
-  files: ResourceFile[];
-  audios: AudioResource[];
+  files: ResourceFile[]; // Ensure ResourceFile is used correctly
+  audios: AudioResource[]; // Use AudioResource instead of Audio
+  completed?: boolean; // Add this line to include the completed property
 }
 
 export interface ResourceFile {
-  id: string;
+  id: string; // Add this line to include the id property
   name: string;
   url: string;
   type: string;

@@ -1,11 +1,10 @@
 
-import React from 'react';
-import { Button } from '@/components/ui/button';
+import React, { useState } from 'react';
+import { Module } from '@/types';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Module } from '@/types';
-import { toast } from 'sonner';
 
 interface ModuleFormProps {
   module?: Module;
@@ -13,80 +12,63 @@ interface ModuleFormProps {
   onCancel: () => void;
 }
 
-export const ModuleForm = ({ module, onSubmit, onCancel }: ModuleFormProps) => {
-  const [title, setTitle] = React.useState(module?.title || '');
-  const [description, setDescription] = React.useState(module?.description || '');
-  const [thumbnail, setThumbnail] = React.useState(module?.thumbnail || '');
-  
+const ModuleForm: React.FC<ModuleFormProps> = ({ module, onSubmit, onCancel }) => {
+  const [moduleTitle, setModuleTitle] = useState(module?.title || '');
+  const [moduleDescription, setModuleDescription] = useState(module?.description || '');
+  const [moduleThumbnail, setModuleThumbnail] = useState(module?.thumbnail || '');
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!title.trim()) {
-      toast.error('Por favor, insira um título');
-      return;
-    }
-    
-    onSubmit({
-      title,
-      description,
-      thumbnail: thumbnail || undefined,
-    });
+
+    const newModuleData: Partial<Module> = {
+      title: moduleTitle,
+      description: moduleDescription,
+      thumbnail: moduleThumbnail,
+    };
+
+    onSubmit(newModuleData);
   };
-  
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="title">Título do Módulo</Label>
-        <Input 
-          id="title" 
-          value={title} 
-          onChange={(e) => setTitle(e.target.value)}
+      <div>
+        <Label htmlFor="moduleTitle">Título do Módulo</Label>
+        <Input
+          id="moduleTitle"
+          value={moduleTitle}
+          onChange={(e) => setModuleTitle(e.target.value)}
           placeholder="Ex: Introdução ao Inglês"
+          required
         />
       </div>
       
-      <div className="space-y-2">
-        <Label htmlFor="description">Descrição</Label>
-        <Textarea 
-          id="description" 
-          value={description} 
-          onChange={(e) => setDescription(e.target.value)}
+      <div>
+        <Label htmlFor="moduleDescription">Descrição</Label>
+        <Textarea
+          id="moduleDescription"
+          value={moduleDescription}
+          onChange={(e) => setModuleDescription(e.target.value)}
           placeholder="Uma breve descrição do módulo"
-          rows={3}
+          required
         />
       </div>
       
-      <div className="space-y-2">
-        <Label htmlFor="thumbnail">Imagem de Capa (URL)</Label>
-        <Input 
-          id="thumbnail" 
-          value={thumbnail} 
-          onChange={(e) => setThumbnail(e.target.value)}
-          placeholder="https://exemplo.com/imagem.jpg"
+      <div>
+        <Label htmlFor="moduleThumbnail">URL da Thumbnail</Label>
+        <Input
+          id="moduleThumbnail"
+          value={moduleThumbnail}
+          onChange={(e) => setModuleThumbnail(e.target.value)}
+          placeholder="https://example.com/thumbnail.jpg"
         />
-        {thumbnail && (
-          <div className="mt-2 rounded-md overflow-hidden border w-32 h-24">
-            <img 
-              src={thumbnail} 
-              alt="Thumbnail preview" 
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = '/placeholder.svg';
-              }}
-            />
-          </div>
-        )}
       </div>
       
-      <div className="flex justify-end space-x-2 pt-4">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Cancelar
-        </Button>
-        <Button type="submit">
-          {module ? 'Atualizar Módulo' : 'Criar Módulo'}
-        </Button>
+      <div className="flex justify-end space-x-2">
+        <Button variant="outline" onClick={onCancel}>Cancelar</Button>
+        <Button type="submit">Salvar Módulo</Button>
       </div>
     </form>
   );
 };
+
+export default ModuleForm;
