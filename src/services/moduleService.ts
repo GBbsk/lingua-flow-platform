@@ -1,20 +1,10 @@
 import { Module, Lesson, ResourceFile, AudioResource } from '@/types';
-
-// Use relative path for API endpoint
-const API_URL = '/api/modules';
+import moduleData from '@/data/moduleData.json';
 
 export const getAllModules = async (): Promise<Module[]> => {
   try {
-    // In development
-    if (process.env.NODE_ENV === 'development') {
-      const modules = await import('@/data/moduleData.json');
-      return modules.modules;
-    }
-    
-    // In production - fetch from public directory
-    const response = await fetch('/data/moduleData.json');
-    const data = await response.json();
-    return data.modules || [];
+    // Simply return the modules from the imported JSON file
+    return moduleData.modules;
   } catch (error) {
     console.error('Error fetching modules:', error);
     return [];
@@ -23,6 +13,11 @@ export const getAllModules = async (): Promise<Module[]> => {
 
 export const saveModule = async (module: Module): Promise<void> => {
   try {
+    // Note: In a static JSON approach, changes won't persist after deployment
+    // This function would only work during local development
+    console.warn('Changes to modules will not persist in production with static JSON files');
+    
+    // For local development purposes only
     const modules = await getAllModules();
     const moduleIndex = modules.findIndex(m => m.id === module.id);
     
@@ -31,31 +26,20 @@ export const saveModule = async (module: Module): Promise<void> => {
     } else {
       modules.push(module);
     }
-
-    // In development, we can't directly modify the imported JSON
-    // In production, use the API route
-    await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ modules }),
-    });
   } catch (error) {
     console.error('Error saving module:', error);
     throw error;
   }
 };
 
-// Implement other methods similarly
 export const deleteModule = async (moduleId: string): Promise<void> => {
   try {
+    // Note: In a static JSON approach, changes won't persist after deployment
+    console.warn('Changes to modules will not persist in production with static JSON files');
+    
+    // For local development purposes only
     const modules = await getAllModules();
     const updatedModules = modules.filter(m => m.id !== moduleId);
-    
-    await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ modules: updatedModules }),
-    });
   } catch (error) {
     console.error('Error deleting module:', error);
     throw error;
@@ -64,6 +48,10 @@ export const deleteModule = async (moduleId: string): Promise<void> => {
 
 export const saveLesson = async (moduleId: string, lesson: Lesson): Promise<void> => {
   try {
+    // Note: In a static JSON approach, changes won't persist after deployment
+    console.warn('Changes to modules will not persist in production with static JSON files');
+    
+    // For local development purposes only
     const modules = await getAllModules();
     const moduleIndex = modules.findIndex(m => m.id === moduleId);
     
@@ -76,12 +64,6 @@ export const saveLesson = async (moduleId: string, lesson: Lesson): Promise<void
     } else {
       modules[moduleIndex].lessons.push(lesson);
     }
-    
-    await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ modules }),
-    });
   } catch (error) {
     console.error('Error saving lesson:', error);
     throw error;
