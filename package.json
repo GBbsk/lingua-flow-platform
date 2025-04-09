@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "cp src/data/moduleData.json public/data/ && next build"
-    "build:dev": "vite build --mode development"
+   
     
   },
   "dependencies": {
