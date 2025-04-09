@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "cp src/data/moduleData.json public/data/ && next build"
+    "build:dev": "vite build --mode development"
+    
   },
   "dependencies": {
     "@vercel/node": "^3.0.17"
