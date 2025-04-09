@@ -1,3 +1,4 @@
+
 import { Module, Lesson, ResourceFile, AudioResource } from '@/types';
 import moduleData from '@/data/moduleData.json';
 
@@ -66,6 +67,72 @@ export const saveLesson = async (moduleId: string, lesson: Lesson): Promise<void
     }
   } catch (error) {
     console.error('Error saving lesson:', error);
+    throw error;
+  }
+};
+
+// Add the missing functions that AdminDashboard.tsx is trying to use
+
+export const deleteLesson = async (moduleId: string, lessonId: string): Promise<void> => {
+  try {
+    // Note: In a static JSON approach, changes won't persist after deployment
+    console.warn('Changes to modules will not persist in production with static JSON files');
+    
+    // For local development purposes only
+    const modules = await getAllModules();
+    const moduleIndex = modules.findIndex(m => m.id === moduleId);
+    
+    if (moduleIndex === -1) throw new Error('Module not found');
+    
+    modules[moduleIndex].lessons = modules[moduleIndex].lessons.filter(l => l.id !== lessonId);
+  } catch (error) {
+    console.error('Error deleting lesson:', error);
+    throw error;
+  }
+};
+
+export const removeFileFromLesson = async (moduleId: string, lessonId: string, fileId: string): Promise<void> => {
+  try {
+    // Note: In a static JSON approach, changes won't persist after deployment
+    console.warn('Changes to modules will not persist in production with static JSON files');
+    
+    // For local development purposes only
+    const modules = await getAllModules();
+    const moduleIndex = modules.findIndex(m => m.id === moduleId);
+    
+    if (moduleIndex === -1) throw new Error('Module not found');
+    
+    const lessonIndex = modules[moduleIndex].lessons.findIndex(l => l.id === lessonId);
+    
+    if (lessonIndex === -1) throw new Error('Lesson not found');
+    
+    modules[moduleIndex].lessons[lessonIndex].files = 
+      modules[moduleIndex].lessons[lessonIndex].files.filter(f => f.id !== fileId);
+  } catch (error) {
+    console.error('Error removing file from lesson:', error);
+    throw error;
+  }
+};
+
+export const removeAudioFromLesson = async (moduleId: string, lessonId: string, audioId: string): Promise<void> => {
+  try {
+    // Note: In a static JSON approach, changes won't persist after deployment
+    console.warn('Changes to modules will not persist in production with static JSON files');
+    
+    // For local development purposes only
+    const modules = await getAllModules();
+    const moduleIndex = modules.findIndex(m => m.id === moduleId);
+    
+    if (moduleIndex === -1) throw new Error('Module not found');
+    
+    const lessonIndex = modules[moduleIndex].lessons.findIndex(l => l.id === lessonId);
+    
+    if (lessonIndex === -1) throw new Error('Lesson not found');
+    
+    modules[moduleIndex].lessons[lessonIndex].audios = 
+      modules[moduleIndex].lessons[lessonIndex].audios.filter(a => a.id !== audioId);
+  } catch (error) {
+    console.error('Error removing audio from lesson:', error);
     throw error;
   }
 };
