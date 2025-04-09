@@ -1,6 +1,19 @@
+
 // Create an API folder with serverless functions
-import { VercelRequest, VercelResponse } from '@vercel/node';
 import { Module } from '../types';
+
+// Define VercelRequest and VercelResponse types to avoid needing @vercel/node
+interface VercelRequest {
+  method: string;
+  body: any;
+}
+
+interface VercelResponse {
+  status: (code: number) => VercelResponse;
+  json: (data: any) => void;
+  setHeader: (key: string, value: string) => void;
+  end: () => void;
+}
 
 // Sample data store (replace with actual database in production)
 let modules: Module[] = [];
