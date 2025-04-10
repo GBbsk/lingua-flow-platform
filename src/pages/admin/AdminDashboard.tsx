@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Book, Edit, Plus, Trash2, Video, Users } from 'lucide-react';
 import { toast } from 'sonner';
-import { Module, Lesson, ResourceFile, AudioResource } from '@/types';
+import type { Module, Lesson, ResourceFile, AudioResource } from '@/types'; // Ensure Lesson is imported as a type
 // Remove unused imports
 import { 
   getAllModules, 
@@ -24,6 +24,7 @@ import {
 } from '@/services/moduleService';
 import ModuleForm from '@/components/admin/ModuleForm';
 import LessonForm from '@/components/admin/LessonForm';
+import LessonDetailView from '@/admin/components/LessonDetailView';
 
 
 const AdminDashboard = () => {
@@ -36,6 +37,9 @@ const AdminDashboard = () => {
   const [selectedModuleId, setSelectedModuleId] = useState<string | null>(null);
   const [selectedLessonId, setSelectedLessonId] = useState<string | null>(null);
   const [resourceType, setResourceType] = useState<'file' | 'audio'>('file');
+  const [isViewingLessonDetails, setIsViewingLessonDetails] = useState<boolean>(false);
+  const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
+  const [selectedModule, setSelectedModule] = useState<Module | null>(null);
   
   // Estados para o formulário de módulo
   const [moduleTitle, setModuleTitle] = useState('');
@@ -116,7 +120,8 @@ const AdminDashboard = () => {
   const handleDeleteModule = async (moduleId: string) => {
     try {
       await deleteModule(moduleId);
-      await loadModules();
+      // Update the local state to remove the deleted module
+      setModules(prevModules => prevModules.filter(module => module.id !== moduleId));
       toast.success('Módulo removido com sucesso');
     } catch (error) {
       toast.error('Erro ao remover módulo');
@@ -347,6 +352,24 @@ const AdminDashboard = () => {
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
+                            {/* Add this new button */}
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+onClick={() => {
+  const module = modules.find(m => m.id === module.id);
+  if (module) {
+    const lesson = module.lessons.find(l => l.id === lesson.id);
+    if (lesson) {
+      setSelectedModule(module);
+      setSelectedLesson(lesson);
+      setIsViewingLessonDetails(true);
+    }
+  }
+}}
+                            >
+                              Ver Detalhes
+                            </Button>
                           </div>
                         </div>
                         <div className="mt-2 text-xs text-muted-foreground flex space-x-4">
@@ -453,6 +476,51 @@ const AdminDashboard = () => {
               lesson={editingLesson || undefined}
               onSubmit={handleLessonSubmit}
               onCancel={() => setIsLessonDialogOpen(false)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+      
+      {/* Lesson Details Dialog */}
+      <Dialog open={isViewingLessonDetails} onOpenChange={setIsViewingLessonDetails}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Detalhes da Aula</DialogTitle>
+          </DialogHeader>
+          {selectedLesson && (
+            <LessonDetailView
+              lesson={selectedLesson}
+              onSave={async (updatedLesson) => {
+                if (selectedModule) {
+                  try {
+                    await saveLesson(selectedModule.id, updatedLesson);
+                    // Update the local state
+                    setModules(prevModules =>
+                      prevModules.map(module =>
+                        module.id === selectedModule.id
+                          ? {
+                              ...module,
+                              lessons: module.lessons.map(lesson =>
+                                lesson.id === updatedLesson.id ? updatedLesson : lesson
+                              )
+                            }
+                          : module
+                      )
+                    );
+                    setIsViewingLessonDetails(false);
+                    setSelectedLesson(null);
+                    setSelectedModule(null);
+                    toast.success('Aula atualizada com sucesso');
+                  } catch (error) {
+                    toast.error('Erro ao salvar detalhes da aula');
+                  }
+                }
+              }}
+              onCancel={() => {
+                setIsViewingLessonDetails(false);
+                setSelectedLesson(null);
+                setSelectedModule(null);
+              }}
             />
           )}
         </DialogContent>

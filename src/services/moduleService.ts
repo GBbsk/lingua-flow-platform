@@ -1,31 +1,19 @@
 import { Module, Lesson, ResourceFile, AudioResource } from '@/types';
-import moduleData from '@/data/moduleData.json';
+import { getAllModules as fetchModules, saveModule as saveModuleAPI, deleteModule as deleteModuleAPI, saveLesson as saveLessonAPI, deleteLesson as deleteLessonAPI } from '@/api/modules';
 
 export const getAllModules = async (): Promise<Module[]> => {
   try {
-    // Simply return the modules from the imported JSON file
-    return moduleData.modules;
+    const modules = await fetchModules();
+    return modules;
   } catch (error) {
     console.error('Error fetching modules:', error);
-    return [];
+    throw error;
   }
 };
 
 export const saveModule = async (module: Module): Promise<void> => {
   try {
-    // Note: In a static JSON approach, changes won't persist after deployment
-    // This function would only work during local development
-    console.warn('Changes to modules will not persist in production with static JSON files');
-    
-    // For local development purposes only
-    const modules = await getAllModules();
-    const moduleIndex = modules.findIndex(m => m.id === module.id);
-    
-    if (moduleIndex !== -1) {
-      modules[moduleIndex] = module;
-    } else {
-      modules.push(module);
-    }
+    await saveModuleAPI(module);
   } catch (error) {
     console.error('Error saving module:', error);
     throw error;
@@ -34,12 +22,7 @@ export const saveModule = async (module: Module): Promise<void> => {
 
 export const deleteModule = async (moduleId: string): Promise<void> => {
   try {
-    // Note: In a static JSON approach, changes won't persist after deployment
-    console.warn('Changes to modules will not persist in production with static JSON files');
-    
-    // For local development purposes only
-    const modules = await getAllModules();
-    const updatedModules = modules.filter(m => m.id !== moduleId);
+    await deleteModuleAPI(moduleId);
   } catch (error) {
     console.error('Error deleting module:', error);
     throw error;
@@ -48,24 +31,66 @@ export const deleteModule = async (moduleId: string): Promise<void> => {
 
 export const saveLesson = async (moduleId: string, lesson: Lesson): Promise<void> => {
   try {
-    // Note: In a static JSON approach, changes won't persist after deployment
-    console.warn('Changes to modules will not persist in production with static JSON files');
-    
-    // For local development purposes only
-    const modules = await getAllModules();
-    const moduleIndex = modules.findIndex(m => m.id === moduleId);
-    
-    if (moduleIndex === -1) throw new Error('Module not found');
-    
-    const lessonIndex = modules[moduleIndex].lessons.findIndex(l => l.id === lesson.id);
-    
-    if (lessonIndex !== -1) {
-      modules[moduleIndex].lessons[lessonIndex] = lesson;
-    } else {
-      modules[moduleIndex].lessons.push(lesson);
-    }
+    await saveLessonAPI(moduleId, lesson);
   } catch (error) {
     console.error('Error saving lesson:', error);
+    throw error;
+  }
+};
+
+export const deleteLesson = async (moduleId: string, lessonId: string): Promise<void> => {
+  try {
+    await deleteLessonAPI(moduleId, lessonId);
+  } catch (error) {
+    console.error('Error deleting lesson:', error);
+    throw error;
+  }
+};
+
+export const removeFileFromLesson = async (
+  moduleId: string, 
+  lessonId: string, 
+  fileId: string
+): Promise<void> => {
+  try {
+    const modules = await fetchModules();
+    const module = modules.find(m => m.id === moduleId);
+    
+    if (!module) throw new Error('Module not found');
+    
+    const lesson = module.lessons.find(l => l.id === lessonId);
+    
+    if (!lesson) throw new Error('Lesson not found');
+    
+    lesson.files = lesson.files.filter(file => file.id !== fileId);
+    
+    await saveModuleAPI(module);
+  } catch (error) {
+    console.error('Error removing file from lesson:', error);
+    throw error;
+  }
+};
+
+export const removeAudioFromLesson = async (
+  moduleId: string, 
+  lessonId: string, 
+  audioId: string
+): Promise<void> => {
+  try {
+    const modules = await fetchModules();
+    const module = modules.find(m => m.id === moduleId);
+    
+    if (!module) throw new Error('Module not found');
+    
+    const lesson = module.lessons.find(l => l.id === lessonId);
+    
+    if (!lesson) throw new Error('Lesson not found');
+    
+    lesson.audios = lesson.audios.filter(audio => audio.id !== audioId);
+    
+    await saveModuleAPI(module);
+  } catch (error) {
+    console.error('Error removing audio from lesson:', error);
     throw error;
   }
 };
